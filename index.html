@@ -88,9 +88,9 @@ td a:hover { text-decoration: underline; color: var(--day); }
 .conf-2 { background: rgba(247,160,114,.15); color: var(--conf2); }
 .conf-1 { background: rgba(255,107,107,.15); color: var(--conf1); }
 .conf-0 { background: rgba(138,155,168,.1); color: var(--grey); }
-.notes-cell { max-width: 180px; }
-.notes-cell .notes-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--t2); font-size: 11px; cursor: pointer; }
-.notes-cell .notes-text:hover { color: var(--white); white-space: normal; }
+.notes-cell { max-width: 160px; overflow: hidden; }
+.notes-cell .notes-text { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--t2); font-size: 11px; cursor: pointer; max-width: 160px; }
+.notes-cell .notes-text:hover { color: var(--white); }
 .country-pill { display: inline-block; padding: 1px 6px; margin: 1px 2px; border-radius: 8px; font-size: 10px; background: rgba(121,226,255,.1); color: var(--monday); border: 1px solid rgba(121,226,255,.15); }
 .country-pill.unconf { background: rgba(245,215,110,.08); color: var(--conf3); border-color: rgba(245,215,110,.15); }
 
@@ -172,7 +172,10 @@ td a:hover { text-decoration: underline; color: var(--day); }
           <path d="M198.703 149.915C198.703 153.071 195.897 155.498 192.736 155.064L147.071 148.731V189.095C147.071 191.62 145.233 193.79 142.704 194.224L78.7422 204.937C75.5411 205.469 72.6364 203.043 72.6364 199.807V84.1014C72.6364 80.8857 75.5411 78.4394 78.7422 78.9721L123.755 86.528V70.8243C123.755 68.2202 125.671 66.0303 128.26 65.6752L192.696 56.7186C195.838 56.2846 198.663 58.7112 198.663 61.8677V149.915H198.683H198.703ZM251.066 0H16.9143C7.5877 0 0 7.53618 0 16.7887V247.195C0 257.256 8.8128 265.049 18.8705 263.885L253.022 236.916C261.558 235.93 268 228.749 268 220.226V16.7887C268 7.49672 260.412 0 251.086 0H251.066Z" fill="#79E2FF"/>
         </svg>
       </div>
-      <span class="topbar-title">Organiser Research</span>
+      <div style="display:flex;flex-direction:column;gap:0">
+        <span class="topbar-title">Organiser Research</span>
+        <span style="font-size:10px;color:var(--t3);letter-spacing:0.3px">by Platinumlist</span>
+      </div>
       <span class="topbar-badge" id="badgeCount"></span>
     </div>
     <div class="topbar-right">
