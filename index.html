@@ -69,7 +69,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--whi
 /* TABLE */
 .table-wrap { padding: 0 28px 28px; overflow-x: auto; }
 table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 12px; }
-thead th { background: var(--storm); color: var(--monday); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; padding: 12px 10px; text-align: left; position: sticky; top: 49px; z-index: 10; cursor: pointer; white-space: nowrap; border-bottom: 2px solid var(--monday); }
+thead th { background: var(--storm); color: var(--monday); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; padding: 12px 10px; text-align: left; z-index: 10; cursor: pointer; white-space: nowrap; border-bottom: 2px solid var(--monday); }
 thead th:hover { color: var(--day); }
 thead th.sort-asc::after { content: ' ▲'; font-size: 9px; }
 thead th.sort-desc::after { content: ' ▼'; font-size: 9px; }
@@ -141,14 +141,13 @@ td a:hover { text-decoration: underline; color: var(--day); }
 <div id="authGate">
   <div class="auth-box">
     <div class="auth-logo">
-      <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="36" height="36" rx="8" fill="#0A181C"/>
-        <rect x="6" y="6" width="14" height="14" rx="3" fill="#79E2FF"/>
-        <rect x="16" y="16" width="14" height="14" rx="3" fill="#79E2FF" opacity="0.4"/>
+      <svg width="40" height="40" viewBox="0 0 268 264" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M142.724 89.704L123.794 86.5277V140.978C123.794 143.582 125.711 145.772 128.299 146.127L147.091 148.731V94.8333C147.091 92.3081 145.253 90.138 142.724 89.704Z" fill="#79E2FF"/>
+        <path d="M198.703 149.915C198.703 153.071 195.897 155.498 192.736 155.064L147.071 148.731V189.095C147.071 191.62 145.233 193.79 142.704 194.224L78.7422 204.937C75.5411 205.469 72.6364 203.043 72.6364 199.807V84.1014C72.6364 80.8857 75.5411 78.4394 78.7422 78.9721L123.755 86.528V70.8243C123.755 68.2202 125.671 66.0303 128.26 65.6752L192.696 56.7186C195.838 56.2846 198.663 58.7112 198.663 61.8677V149.915H198.683H198.703ZM251.066 0H16.9143C7.5877 0 0 7.53618 0 16.7887V247.195C0 257.256 8.8128 265.049 18.8705 263.885L253.022 236.916C261.558 235.93 268 228.749 268 220.226V16.7887C268 7.49672 260.412 0 251.086 0H251.066Z" fill="#79E2FF"/>
       </svg>
     </div>
     <div class="auth-title">Organiser Research</div>
-    <div class="auth-sub">Platinumlist internal dashboard</div>
+    <div class="auth-sub">by Platinumlist</div>
     <div id="stepEmail">
       <input type="email" class="auth-input" id="authEmail" placeholder="you@platinumlist.net" onkeydown="if(event.key==='Enter')sendOtp()">
       <button class="auth-btn" id="btnSend" onclick="sendOtp()">Send Code</button>
@@ -168,10 +167,9 @@ td a:hover { text-decoration: underline; color: var(--day); }
   <div class="topbar">
     <div class="topbar-left">
       <div class="topbar-logo">
-        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="28" height="28" rx="6" fill="#0A181C"/>
-          <rect x="4" y="4" width="11" height="11" rx="2.5" fill="#79E2FF"/>
-          <rect x="13" y="13" width="11" height="11" rx="2.5" fill="#79E2FF" opacity="0.4"/>
+        <svg width="24" height="24" viewBox="0 0 268 264" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M142.724 89.704L123.794 86.5277V140.978C123.794 143.582 125.711 145.772 128.299 146.127L147.091 148.731V94.8333C147.091 92.3081 145.253 90.138 142.724 89.704Z" fill="#79E2FF"/>
+          <path d="M198.703 149.915C198.703 153.071 195.897 155.498 192.736 155.064L147.071 148.731V189.095C147.071 191.62 145.233 193.79 142.704 194.224L78.7422 204.937C75.5411 205.469 72.6364 203.043 72.6364 199.807V84.1014C72.6364 80.8857 75.5411 78.4394 78.7422 78.9721L123.755 86.528V70.8243C123.755 68.2202 125.671 66.0303 128.26 65.6752L192.696 56.7186C195.838 56.2846 198.663 58.7112 198.663 61.8677V149.915H198.683H198.703ZM251.066 0H16.9143C7.5877 0 0 7.53618 0 16.7887V247.195C0 257.256 8.8128 265.049 18.8705 263.885L253.022 236.916C261.558 235.93 268 228.749 268 220.226V16.7887C268 7.49672 260.412 0 251.086 0H251.066Z" fill="#79E2FF"/>
         </svg>
       </div>
       <span class="topbar-title">Organiser Research</span>
@@ -212,51 +210,47 @@ td a:hover { text-decoration: underline; color: var(--day); }
     </div>
     <div class="filter-group">
       <span class="filter-label">Website</span>
-      <select class="filter-select mini" id="fWebsite" onchange="applyFilters()">
-        <option value="">Any</option><option value="yes">Has</option><option value="no">No</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">W.Conf</span>
-      <select class="filter-select mini" id="fWConf" onchange="applyFilters()">
-        <option value="">Any</option><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option>
-      </select>
+      <div style="display:flex;gap:4px;align-items:center">
+        <select class="filter-select mini" id="fWebsite" onchange="toggleConf('W');applyFilters()">
+          <option value="">Any</option><option value="yes">Has</option><option value="no">No</option>
+        </select>
+        <select class="filter-select mini" id="fWConf" onchange="applyFilters()" style="display:none" title="Confidence">
+          <option value="">Conf</option><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option>
+        </select>
+      </div>
     </div>
     <div class="filter-group">
       <span class="filter-label">Instagram</span>
-      <select class="filter-select mini" id="fIG" onchange="applyFilters()">
-        <option value="">Any</option><option value="yes">Has</option><option value="no">No</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">IG.Conf</span>
-      <select class="filter-select mini" id="fIGConf" onchange="applyFilters()">
-        <option value="">Any</option><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option>
-      </select>
+      <div style="display:flex;gap:4px;align-items:center">
+        <select class="filter-select mini" id="fIG" onchange="toggleConf('IG');applyFilters()">
+          <option value="">Any</option><option value="yes">Has</option><option value="no">No</option>
+        </select>
+        <select class="filter-select mini" id="fIGConf" onchange="applyFilters()" style="display:none" title="Confidence">
+          <option value="">Conf</option><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option>
+        </select>
+      </div>
     </div>
     <div class="filter-group">
       <span class="filter-label">Facebook</span>
-      <select class="filter-select mini" id="fFB" onchange="applyFilters()">
-        <option value="">Any</option><option value="yes">Has</option><option value="no">No</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">FB.Conf</span>
-      <select class="filter-select mini" id="fFBConf" onchange="applyFilters()">
-        <option value="">Any</option><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option>
-      </select>
+      <div style="display:flex;gap:4px;align-items:center">
+        <select class="filter-select mini" id="fFB" onchange="toggleConf('FB');applyFilters()">
+          <option value="">Any</option><option value="yes">Has</option><option value="no">No</option>
+        </select>
+        <select class="filter-select mini" id="fFBConf" onchange="applyFilters()" style="display:none" title="Confidence">
+          <option value="">Conf</option><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option>
+        </select>
+      </div>
     </div>
     <div class="filter-group">
       <span class="filter-label">LinkedIn</span>
-      <select class="filter-select mini" id="fLI" onchange="applyFilters()">
-        <option value="">Any</option><option value="yes">Has</option><option value="no">No</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">LI.Conf</span>
-      <select class="filter-select mini" id="fLIConf" onchange="applyFilters()">
-        <option value="">Any</option><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option>
-      </select>
+      <div style="display:flex;gap:4px;align-items:center">
+        <select class="filter-select mini" id="fLI" onchange="toggleConf('LI');applyFilters()">
+          <option value="">Any</option><option value="yes">Has</option><option value="no">No</option>
+        </select>
+        <select class="filter-select mini" id="fLIConf" onchange="applyFilters()" style="display:none" title="Confidence">
+          <option value="">Conf</option><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option>
+        </select>
+      </div>
     </div>
     <button class="filter-btn" onclick="resetFilters()">Reset</button>
     <span class="filter-count" id="filterCount"></span>
@@ -410,19 +404,13 @@ var COLS = [
   {key:"o", label:"Organiser", w:"180px"},
   {key:"p", label:"Phone", w:"120px"},
   {key:"e", label:"Email", w:"160px"},
-  {key:"w", label:"Website", w:"140px"},
-  {key:"wn", label:"W.Notes", w:"160px", isNote:true},
-  {key:"ig", label:"Instagram", w:"140px"},
-  {key:"ign", label:"IG.Notes", w:"160px", isNote:true},
-  {key:"fb", label:"Facebook", w:"140px"},
-  {key:"fbn", label:"FB.Notes", w:"160px", isNote:true},
-  {key:"li", label:"LinkedIn", w:"140px"},
-  {key:"lin", label:"LI.Notes", w:"160px", isNote:true},
-  {key:"es", label:"Extra", w:"140px", isNote:true},
-  {key:"cc", label:"Confirmed", w:"160px"},
-  {key:"cen", label:"Evidence", w:"160px", isNote:true},
-  {key:"uc", label:"Unconfirmed", w:"160px"},
-  {key:"ucn", label:"Unconf.Notes", w:"160px", isNote:true}
+  {key:"w", label:"Website", w:"150px"},
+  {key:"ig", label:"Instagram", w:"150px"},
+  {key:"fb", label:"Facebook", w:"150px"},
+  {key:"li", label:"LinkedIn", w:"150px"},
+  {key:"es", label:"Extra", w:"140px"},
+  {key:"cc", label:"Confirmed Countries", w:"180px"},
+  {key:"uc", label:"Unconfirmed Countries", w:"180px"}
 ];
 
 /* ===== INIT ===== */
@@ -510,6 +498,20 @@ function applyFilters() {
   renderPagination();
 }
 
+function toggleConf(prefix) {
+  var map = {W: ["fWebsite","fWConf"], IG: ["fIG","fIGConf"], FB: ["fFB","fFBConf"], LI: ["fLI","fLIConf"]};
+  var pair = map[prefix];
+  if (!pair) return;
+  var hasVal = document.getElementById(pair[0]).value;
+  var confEl = document.getElementById(pair[1]);
+  if (hasVal === "yes") {
+    confEl.style.display = "";
+  } else {
+    confEl.style.display = "none";
+    confEl.value = "";
+  }
+}
+
 function resetFilters() {
   document.getElementById("fSearch").value = "";
   document.getElementById("fRegion").value = "";
@@ -523,6 +525,7 @@ function resetFilters() {
   document.getElementById("fFBConf").value = "";
   document.getElementById("fLI").value = "";
   document.getElementById("fLIConf").value = "";
+  toggleConf("W"); toggleConf("IG"); toggleConf("FB"); toggleConf("LI");
   applyFilters();
 }
 
@@ -570,18 +573,12 @@ function renderTable() {
     html += '<td>' + esc(d.p) + '</td>';
     html += '<td>' + (d.e ? '<a href="mailto:' + esc(d.e) + '" onclick="event.stopPropagation()">' + esc(d.e) + '</a>' : '—') + '</td>';
     html += '<td>' + linkCell(d.w, d.wc) + '</td>';
-    html += '<td class="notes-cell">' + truncNote(d.wn, 50) + '</td>';
     html += '<td>' + linkCell(d.ig, d.igc) + '</td>';
-    html += '<td class="notes-cell">' + truncNote(d.ign, 50) + '</td>';
     html += '<td>' + linkCell(d.fb, d.fbc) + '</td>';
-    html += '<td class="notes-cell">' + truncNote(d.fbn, 50) + '</td>';
     html += '<td>' + linkCell(d.li, d.lic) + '</td>';
-    html += '<td class="notes-cell">' + truncNote(d.lin, 50) + '</td>';
     html += '<td class="notes-cell">' + truncNote(d.es, 50) + '</td>';
     html += '<td>' + countryPills(d.cc) + '</td>';
-    html += '<td class="notes-cell">' + truncNote(d.cen, 50) + '</td>';
     html += '<td>' + countryPills(d.uc, "unconf") + '</td>';
-    html += '<td class="notes-cell">' + truncNote(d.ucn, 50) + '</td>';
     html += '</tr>';
   }
   document.getElementById("tbody").innerHTML = html;
