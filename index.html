@@ -38,6 +38,8 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--whi
 .topbar-right { display: flex; align-items: center; gap: 12px; }
 .logout-btn { background: transparent; border: 1px solid var(--bd); color: var(--t2); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: 'Inter', sans-serif; transition: all .2s; }
 .logout-btn:hover { border-color: var(--monday); color: var(--monday); }
+.auth-input:disabled { opacity: 0.5; }
+.auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* STATS ROW */
 .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; padding: 24px 32px; }
@@ -121,6 +123,7 @@ td a:hover { text-decoration: underline; color: var(--day); }
   .filter-input { min-width: 180px; }
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -129,10 +132,18 @@ td a:hover { text-decoration: underline; color: var(--day); }
   <div class="auth-box">
     <svg class="auth-logo" viewBox="0 0 48 48" fill="none"><rect x="4" y="4" width="40" height="40" rx="8" fill="#79E2FF"/><rect x="12" y="12" width="14" height="24" fill="#221327"/><rect x="22" y="12" width="14" height="14" fill="#221327" opacity="0.6"/></svg>
     <div class="auth-title">ORGANISER RESEARCH</div>
-    <div class="auth-sub">Enter password to access the dashboard</div>
-    <input type="password" class="auth-input" id="authPw" placeholder="Password" onkeydown="if(event.key==='Enter')checkPw()">
-    <button class="auth-btn" onclick="checkPw()">Access Dashboard</button>
-    <div class="auth-err" id="authErr">Incorrect password. Try again.</div>
+    <div id="stepEmail">
+      <div class="auth-sub">Enter your @platinumlist.net email to receive a login code</div>
+      <input type="email" class="auth-input" id="authEmail" placeholder="you@platinumlist.net" onkeydown="if(event.key==='Enter')sendOtp()">
+      <button class="auth-btn" id="btnSend" onclick="sendOtp()">Send Code</button>
+    </div>
+    <div id="stepCode" style="display:none">
+      <div class="auth-sub" id="codeSub">We sent a 6-digit code to your email</div>
+      <input type="text" class="auth-input" id="authCode" placeholder="Enter 6-digit code" maxlength="6" style="text-align:center;font-size:24px;letter-spacing:8px" oninput="if(this.value.length===6)verifyOtp()" onkeydown="if(event.key==='Enter')verifyOtp()">
+      <button class="auth-btn" onclick="verifyOtp()">Verify</button>
+      <div style="margin-top:16px"><a href="#" onclick="backToEmail()" style="color:var(--t2);font-size:13px;text-decoration:none">Use a different email</a></div>
+    </div>
+    <div class="auth-err" id="authErr"></div>
   </div>
 </div>
 
@@ -255,7 +266,10 @@ td a:hover { text-decoration: underline; color: var(--day); }
 </div>
 
 <script>
-var AUTH_PW = "plorg2026";
+var SUPABASE_URL = "https://kwftlkfvtglnugxsyjci.supabase.co";
+var SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3ZnRsa2Z2dGdsbnVneHN5amNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc2NDAxODUsImV4cCI6MjA2MzIxNjE4NX0.9Cn1xahmF8q6pbbWQHNyQSc9fZkVvJaqTzMRZCtmb9E";
+var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+var otpEmail = "";
 var PER_PAGE = 50;
 var currentPage = 1;
 var sortCol = 'o';
@@ -266,23 +280,77 @@ var DATA = [{"r":"UAE","o":"Five HOTEL - FZE","p":"+971506459220","e":"roshdy@fi
 
 var COUNTRIES = ["\"UAE\"", "Abu Dhabi", "Afghanistan", "Albania", "Argentina", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Belgium", "Belgium\"", "Bermuda", "Bhutan", "Bosnia and Herzegovina", "Botswana", "Brazil", "Bulgaria", "Cambodia", "Canada", "Cape Verde", "Chile", "China", "Colombia", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominican Republic", "Egypt", "Egypt\"", "Finland", "France", "France (Day trips via Eurostar from London to Paris)", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Guatemala", "Haiti", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kuwait", "Lebanon", "Lithuania", "Luxembourg", "Malaysia", "Maldives", "Malta", "Mauritius", "Mexico", "Monaco", "Montenegro", "Morocco", "Myanmar", "Namibia", "Nepal", "Netherlands", "New Zealand", "Nigeria", "Norway", "Oman", "Pakistan", "Palestine", "Panama", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Saudi Arabia", "Scotland", "Serbia", "Seychelles", "Singapore", "Singapore\"", "Slovakia", "Slovenia", "South Africa", "South Korea", "Spain", "Sri Lanka", "Sweden", "Switzerland", "Syria", "Taiwan", "Tanzania", "Thailand", "Trinidad and Tobago", "Tunisia", "Turkey", "UAE", "UK", "USA", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United Kingdom\"", "United States", "Uzbekistan", "Venezuela", "Vietnam"];
 
-function checkPw() {
-  var pw = document.getElementById("authPw").value;
-  if (pw === AUTH_PW) {
-    sessionStorage.setItem("plOrgAuth", "1");
+function showErr(msg) {
+  var el = document.getElementById("authErr");
+  el.textContent = msg;
+  el.style.display = msg ? "block" : "none";
+}
+
+async function sendOtp() {
+  showErr("");
+  var email = document.getElementById("authEmail").value.trim().toLowerCase();
+  if (!email.endsWith("@platinumlist.net")) {
+    showErr("Only @platinumlist.net emails are allowed");
+    return;
+  }
+  var btn = document.getElementById("btnSend");
+  btn.disabled = true;
+  btn.textContent = "Sending...";
+  try {
+    var res = await sb.auth.signInWithOtp({ email: email });
+    if (res.error) {
+      showErr(res.error.message);
+      btn.disabled = false;
+      btn.textContent = "Send Code";
+      return;
+    }
+    otpEmail = email;
+    document.getElementById("stepEmail").style.display = "none";
+    document.getElementById("stepCode").style.display = "block";
+    document.getElementById("codeSub").textContent = "Code sent to " + email;
+    document.getElementById("authCode").focus();
+  } catch(e) {
+    showErr("Failed to send code. Try again.");
+  }
+  btn.disabled = false;
+  btn.textContent = "Send Code";
+}
+
+async function verifyOtp() {
+  showErr("");
+  var code = document.getElementById("authCode").value.trim();
+  if (code.length !== 6) { showErr("Enter 6-digit code"); return; }
+  try {
+    var res = await sb.auth.verifyOtp({ email: otpEmail, token: code, type: "email" });
+    if (res.error) {
+      showErr(res.error.message || "Invalid code. Try again.");
+      document.getElementById("authCode").value = "";
+      return;
+    }
     document.getElementById("authGate").style.display = "none";
     document.getElementById("dashboard").style.display = "block";
     init();
-  } else {
-    document.getElementById("authErr").style.display = "block";
-    document.getElementById("authPw").value = "";
+  } catch(e) {
+    showErr("Verification failed. Try again.");
   }
 }
 
-function logout() {
-  sessionStorage.removeItem("plOrgAuth");
+function backToEmail() {
+  showErr("");
+  document.getElementById("stepCode").style.display = "none";
+  document.getElementById("stepEmail").style.display = "block";
+  document.getElementById("authCode").value = "";
+}
+
+async function logout() {
+  await sb.auth.signOut();
   document.getElementById("dashboard").style.display = "none";
   document.getElementById("authGate").style.display = "flex";
+  document.getElementById("stepEmail").style.display = "block";
+  document.getElementById("stepCode").style.display = "none";
+  document.getElementById("authEmail").value = "";
+  document.getElementById("authCode").value = "";
+  showErr("");
 }
 
 function init() {
@@ -486,12 +554,22 @@ function exportCSV() {
   a.click();
 }
 
-// Auto-login check
-if (sessionStorage.getItem("plOrgAuth")) {
-  document.getElementById("authGate").style.display = "none";
-  document.getElementById("dashboard").style.display = "block";
-  init();
-}
+// Auto-login check via Supabase session
+(async function() {
+  var sess = await sb.auth.getSession();
+  if (sess.data.session) {
+    document.getElementById("authGate").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+    init();
+  }
+})();
+
+sb.auth.onAuthStateChange(function(event, session) {
+  if (event === "SIGNED_OUT") {
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("authGate").style.display = "flex";
+  }
+});
 
 document.addEventListener("keydown", function(e) { if (e.key === "Escape") closeModal(); });
 </script>
