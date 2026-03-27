@@ -195,19 +195,19 @@ td a:hover { text-decoration: underline; color: var(--day); }
       <input class="filter-input" id="fSearch" placeholder="Name, email, URL..." oninput="applyFilters()">
     </div>
     <div class="filter-group">
-      <span class="filter-label">Market</span>
+      <span class="filter-label">Listed in</span>
       <select class="filter-select" id="fRegion" onchange="applyFilters()" style="min-width:100px">
         <option value="">All</option>
       </select>
     </div>
     <div class="filter-group">
-      <span class="filter-label">Confirmed Country</span>
+      <span class="filter-label">New Confirmed</span>
       <select class="filter-select" id="fConfCountry" onchange="applyFilters()">
         <option value="">All</option>
       </select>
     </div>
     <div class="filter-group">
-      <span class="filter-label">Unconfirmed Country</span>
+      <span class="filter-label">New Unconfirmed</span>
       <select class="filter-select" id="fUnconfCountry" onchange="applyFilters()">
         <option value="">All</option>
       </select>
@@ -405,7 +405,7 @@ function truncNote(s, len) {
 /* ===== COLUMNS ===== */
 var COLS = [
   {key:"_n", label:"#", w:"40px", nosort:true},
-  {key:"r", label:"Market", w:"70px"},
+  {key:"r", label:"Listed in", w:"80px"},
   {key:"o", label:"Organiser", w:"180px"},
   {key:"p", label:"Phone", w:"120px"},
   {key:"e", label:"Email", w:"160px"},
@@ -414,8 +414,8 @@ var COLS = [
   {key:"fb", label:"Facebook", w:"150px"},
   {key:"li", label:"LinkedIn", w:"150px"},
   {key:"es", label:"Extra", w:"140px"},
-  {key:"cc", label:"Confirmed Countries", w:"180px"},
-  {key:"uc", label:"Unconfirmed Countries", w:"180px"}
+  {key:"cc", label:"New Confirmed", w:"180px"},
+  {key:"uc", label:"New Unconfirmed", w:"180px"}
 ];
 
 /* ===== INIT ===== */
@@ -623,7 +623,7 @@ function openModal(idx) {
   
   var html = '';
   // Region / Market
-  html += '<div class="modal-inline"><div class="modal-inline-label">Market</div><div class="modal-inline-value">' + esc(d.r) + '</div></div>';
+  html += '<div class="modal-inline"><div class="modal-inline-label">Listed on PL in</div><div class="modal-inline-value">' + esc(d.r) + '</div></div>';
   // Phone / Email
   html += '<div class="modal-inline"><div class="modal-inline-label">Phone</div><div class="modal-inline-value">' + esc(d.p || "—") + '</div></div>';
   html += '<div class="modal-inline"><div class="modal-inline-label">Email</div><div class="modal-inline-value">' + (d.e ? '<a href="mailto:' + esc(d.e) + '">' + esc(d.e) + '</a>' : '—') + '</div></div>';
@@ -641,13 +641,13 @@ function openModal(idx) {
     html += buildCollapsible("Extra Socials", esc(d.es).substring(0,60) + (d.es.length > 60 ? '...' : ''), d.es, "Details");
   }
   // Collapsible: Confirmed Countries
-  html += buildCollapsible("Confirmed Countries", d.cc ? countryPills(d.cc) : '—', d.cen, "Evidence Notes");
+  html += buildCollapsible("New Confirmed Countries", d.cc ? countryPills(d.cc) : '—', d.cen, "Evidence Notes");
   // Cities
   if (d.ci) {
     html += '<div class="modal-inline"><div class="modal-inline-label">Confirmed Cities</div><div class="modal-inline-value" style="font-size:12px;color:var(--t2)">' + esc(d.ci) + '</div></div>';
   }
   // Collapsible: Unconfirmed Countries
-  html += buildCollapsible("Unconfirmed Countries", d.uc ? countryPills(d.uc, "unconf") : '—', d.ucn, "Research Notes");
+  html += buildCollapsible("New Unconfirmed Countries", d.uc ? countryPills(d.uc, "unconf") : '—', d.ucn, "Research Notes");
   
   document.getElementById("modalBody").innerHTML = html;
   document.getElementById("modal").classList.add("show");
@@ -677,7 +677,7 @@ function closeModal() {
 
 /* ===== CSV EXPORT ===== */
 function exportXLSX() {
-  var headers = ["Market","Organiser","Phone","Email","Website","W.Conf","W.Notes","Instagram","IG.Conf","IG.Notes","Facebook","FB.Conf","FB.Notes","LinkedIn","LI.Conf","LI.Notes","Extra Socials","Confirmed Countries","Country Evidence","Confirmed Cities","Unconfirmed Countries","Unconfirmed Notes"];
+  var headers = ["Listed in","Organiser","Phone","Email","Website","W.Conf","W.Notes","Instagram","IG.Conf","IG.Notes","Facebook","FB.Conf","FB.Notes","LinkedIn","LI.Conf","LI.Notes","Extra Socials","New Confirmed Countries","Country Evidence","Confirmed Cities","New Unconfirmed Countries","Unconfirmed Notes"];
   var rows = [headers];
   filtered.forEach(function(d) {
     rows.push([d.r, d.o, d.p, d.e, d.w, d.wc, d.wn, d.ig, d.igc, d.ign, d.fb, d.fbc, d.fbn, d.li, d.lic, d.lin, d.es, d.cc, d.cen, d.ci, d.uc, d.ucn]);
