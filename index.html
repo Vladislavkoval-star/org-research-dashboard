@@ -179,7 +179,8 @@ td a:hover { text-decoration: underline; color: var(--day); }
       <span class="topbar-badge" id="badgeCount"></span>
     </div>
     <div class="topbar-right">
-      <button class="export-btn" onclick="exportCSV()">Export CSV</button>
+      <a href="https://docs.google.com/spreadsheets/d/1jFV4gkKrCUsSICG5ZQMS_bamEqp1iPgccmK2VN0I3Ms/edit?gid=579913514#gid=579913514" target="_blank" class="export-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Source Table</a>
+      <button class="export-btn" onclick="exportXLSX()">Export Excel</button>
       <button class="logout-btn" onclick="doLogout()">Logout</button>
     </div>
   </div>
@@ -281,6 +282,7 @@ td a:hover { text-decoration: underline; color: var(--day); }
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script>
 var SUPABASE_URL = "https://kwftlkfvtglnugxsyjci.supabase.co";
 var SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3ZnRsa2Z2dGdsbnVneHN5amNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc2NDAxODUsImV4cCI6MjA2MzIxNjE4NX0.9Cn1xahmF8q6pbbWQHNyQSc9fZkVvJaqTzMRZCtmb9E";
@@ -674,18 +676,18 @@ function closeModal() {
 }
 
 /* ===== CSV EXPORT ===== */
-function exportCSV() {
+function exportXLSX() {
   var headers = ["Market","Organiser","Phone","Email","Website","W.Conf","W.Notes","Instagram","IG.Conf","IG.Notes","Facebook","FB.Conf","FB.Notes","LinkedIn","LI.Conf","LI.Notes","Extra Socials","Confirmed Countries","Country Evidence","Confirmed Cities","Unconfirmed Countries","Unconfirmed Notes"];
-  var csvRows = [headers.join(",")];
+  var rows = [headers];
   filtered.forEach(function(d) {
-    var row = [d.r, d.o, d.p, d.e, d.w, d.wc, d.wn, d.ig, d.igc, d.ign, d.fb, d.fbc, d.fbn, d.li, d.lic, d.lin, d.es, d.cc, d.cen, d.ci, d.uc, d.ucn];
-    csvRows.push(row.map(function(v) { return '"' + String(v||'').replace(/"/g, '""') + '"'; }).join(","));
+    rows.push([d.r, d.o, d.p, d.e, d.w, d.wc, d.wn, d.ig, d.igc, d.ign, d.fb, d.fbc, d.fbn, d.li, d.lic, d.lin, d.es, d.cc, d.cen, d.ci, d.uc, d.ucn]);
   });
-  var blob = new Blob(["\uFEFF" + csvRows.join("\n")], {type: "text/csv;charset=utf-8;"});
-  var link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "org_research_export.csv";
-  link.click();
+  var ws = XLSX.utils.aoa_to_sheet(rows);
+  var colWidths = [8,28,16,28,30,6,30,30,6,30,30,6,30,30,6,30,24,24,24,24,24,24];
+  ws["!cols"] = colWidths.map(function(w){return {wch:w}});
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Organisers");
+  XLSX.writeFile(wb, "org_research_export.xlsx");
 }
 
 /* ===== SESSION CHECK ===== */
