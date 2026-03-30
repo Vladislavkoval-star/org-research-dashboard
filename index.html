@@ -194,11 +194,8 @@ td a:hover { text-decoration: underline; color: var(--day); }
       <span class="filter-label">Search</span>
       <input class="filter-input" id="fSearch" placeholder="Name, email, URL..." oninput="applyFilters()">
     </div>
-    <div class="filter-group">
-      <span class="filter-label">Listed in</span>
-      <select class="filter-select" id="fRegion" onchange="applyFilters()" style="min-width:100px">
-        <option value="">All</option>
-      </select>
+    <div class="filter-group" style="justify-content:flex-end">
+      <button class="filter-btn" id="fNonGCC" onclick="toggleNonGCC()" style="white-space:nowrap">Non-GCC</button>
     </div>
     <div class="filter-group">
       <span class="filter-label">New Confirmed</span>
@@ -405,7 +402,6 @@ function truncNote(s, len) {
 /* ===== COLUMNS ===== */
 var COLS = [
   {key:"_n", label:"#", w:"40px", nosort:true},
-  {key:"r", label:"Listed in", w:"80px"},
   {key:"o", label:"Organiser", w:"180px"},
   {key:"p", label:"Phone", w:"120px"},
   {key:"e", label:"Email", w:"160px"},
@@ -421,16 +417,6 @@ var COLS = [
 /* ===== INIT ===== */
 function init() {
   // Populate region filter
-  var regions = {};
-  DATA.forEach(function(d) { regions[d.r] = (regions[d.r]||0)+1; });
-  var sel = document.getElementById("fRegion");
-  Object.keys(regions).sort().forEach(function(r) {
-    var o = document.createElement("option");
-    o.value = r;
-    o.textContent = r + " (" + regions[r] + ")";
-    sel.appendChild(o);
-  });
-
   // Populate country filters
   var cSel = document.getElementById("fConfCountry");
   CONF_COUNTRIES.forEach(function(c) {
@@ -453,9 +439,26 @@ function init() {
 }
 
 /* ===== FILTERS ===== */
+var GCC = ["UAE","Bahrain","Qatar","Oman","Saudi Arabia","Kuwait","KSA","Saudi"];
+var nonGCCActive = false;
+function toggleNonGCC() {
+  nonGCCActive = !nonGCCActive;
+  var btn = document.getElementById("fNonGCC");
+  if (nonGCCActive) { btn.style.background = "var(--monday)"; btn.style.color = "var(--black)"; btn.style.borderColor = "var(--monday)"; }
+  else { btn.style.background = "transparent"; btn.style.color = "var(--monday)"; btn.style.borderColor = "var(--monday)"; }
+  applyFilters();
+}
+function hasNonGCC(d) {
+  var countries = ((d.cc || "") + "," + (d.uc || "")).split(",");
+  for (var i = 0; i < countries.length; i++) {
+    var c = countries[i].trim();
+    if (c && GCC.indexOf(c) === -1) return true;
+  }
+  return false;
+}
+
 function applyFilters() {
   var search = document.getElementById("fSearch").value.trim().toLowerCase();
-  var region = document.getElementById("fRegion").value;
   var confC = document.getElementById("fConfCountry").value;
   var unconfC = document.getElementById("fUnconfCountry").value;
   var fW = document.getElementById("fWebsite").value;
@@ -468,7 +471,7 @@ function applyFilters() {
   var fLIC = document.getElementById("fLIConf").value;
 
   filtered = DATA.filter(function(d) {
-    if (region && d.r !== region) return false;
+    if (nonGCCActive && !hasNonGCC(d)) return false;
     if (confC && (!d.cc || d.cc.toLowerCase().indexOf(confC.toLowerCase()) === -1)) return false;
     if (unconfC && (!d.uc || d.uc.toLowerCase().indexOf(unconfC.toLowerCase()) === -1)) return false;
     if (fW === "yes" && !d.w) return false;
@@ -519,7 +522,9 @@ function toggleConf(prefix) {
 
 function resetFilters() {
   document.getElementById("fSearch").value = "";
-  document.getElementById("fRegion").value = "";
+  nonGCCActive = false;
+  var btn = document.getElementById("fNonGCC");
+  btn.style.background = "transparent"; btn.style.color = "var(--monday)"; btn.style.borderColor = "var(--monday)";
   document.getElementById("fConfCountry").value = "";
   document.getElementById("fUnconfCountry").value = "";
   document.getElementById("fWebsite").value = "";
@@ -573,7 +578,6 @@ function renderTable() {
     var globalIdx = start + (i - start) + 1;
     html += '<tr onclick="openModal(' + i + ')">';
     html += '<td>' + globalIdx + '</td>';
-    html += '<td>' + esc(d.r) + '</td>';
     html += '<td class="org-name">' + esc(d.o) + '</td>';
     html += '<td>' + esc(d.p) + '</td>';
     html += '<td>' + (d.e ? '<a href="mailto:' + esc(d.e) + '" onclick="event.stopPropagation()">' + esc(d.e) + '</a>' : '—') + '</td>';
