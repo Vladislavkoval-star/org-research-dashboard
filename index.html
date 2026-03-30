@@ -66,6 +66,24 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--whi
 .filter-count { color: var(--day); font-size: 12px; font-weight: 600; padding-bottom: 8px; }
 .filter-select.mini { min-width: 60px; padding: 8px 6px; font-size: 11px; }
 
+/* MULTI-SELECT DROPDOWN */
+.ms-wrap { position: relative; min-width: 150px; }
+.ms-toggle { padding: 8px 28px 8px 12px; background: var(--s2); border: 1px solid var(--bd); border-radius: 7px; color: var(--white); font-size: 12px; font-family: 'Inter', sans-serif; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; user-select: none; position: relative; }
+.ms-toggle::after { content: '\25BE'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--t2); font-size: 10px; }
+.ms-toggle:hover, .ms-toggle.open { border-color: var(--monday); }
+.ms-toggle .ms-count { background: var(--monday); color: var(--black); font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 8px; margin-left: 4px; }
+.ms-drop { display: none; position: absolute; top: calc(100% + 4px); left: 0; background: var(--s2); border: 1px solid var(--bd); border-radius: 8px; z-index: 200; min-width: 200px; max-height: 260px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,.5); }
+.ms-drop.open { display: block; }
+.ms-drop-search { width: calc(100% - 16px); margin: 8px; padding: 6px 10px; background: var(--storm); border: 1px solid var(--bd); border-radius: 5px; color: var(--white); font-size: 11px; font-family: 'Inter', sans-serif; outline: none; }
+.ms-drop-search:focus { border-color: var(--monday); }
+.ms-item { display: flex; align-items: center; gap: 8px; padding: 6px 12px; cursor: pointer; font-size: 11px; color: var(--white); transition: background .1s; }
+.ms-item:hover { background: var(--card); }
+.ms-item input[type=checkbox] { accent-color: var(--monday); width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
+.ms-item label { cursor: pointer; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ms-drop::-webkit-scrollbar { width: 5px; }
+.ms-drop::-webkit-scrollbar-track { background: transparent; }
+.ms-drop::-webkit-scrollbar-thumb { background: var(--bd); border-radius: 3px; }
+
 /* TABLE */
 .table-wrap { padding: 0 28px 28px; overflow-x: auto; }
 table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 12px; }
@@ -196,15 +214,24 @@ td a:hover { text-decoration: underline; color: var(--day); }
     </div>
     <div class="filter-group">
       <span class="filter-label">New Confirmed</span>
-      <select class="filter-select" id="fConfCountry" onchange="applyFilters()">
-        <option value="">All</option>
-      </select>
+      <div class="ms-wrap" id="msConf">
+        <div class="ms-toggle" onclick="msToggle('msConf')">All</div>
+        <div class="ms-drop" id="msConfDrop"></div>
+      </div>
     </div>
     <div class="filter-group">
       <span class="filter-label">New Unconfirmed</span>
-      <select class="filter-select" id="fUnconfCountry" onchange="applyFilters()">
-        <option value="">All</option>
-      </select>
+      <div class="ms-wrap" id="msUnconf">
+        <div class="ms-toggle" onclick="msToggle('msUnconf')">All</div>
+        <div class="ms-drop" id="msUnconfDrop"></div>
+      </div>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Any Country</span>
+      <div class="ms-wrap" id="msAny">
+        <div class="ms-toggle" onclick="msToggle('msAny')">All</div>
+        <div class="ms-drop" id="msAnyDrop"></div>
+      </div>
     </div>
     <div class="filter-group">
       <span class="filter-label">Website</span>
@@ -414,16 +441,13 @@ var COLS = [
 
 /* ===== INIT ===== */
 function init() {
-  // Populate region filter
-  // Populate country filters
-  var cSel = document.getElementById("fConfCountry");
-  CONF_COUNTRIES.forEach(function(c) {
-    var o = document.createElement("option"); o.value = c; o.textContent = c; cSel.appendChild(o);
-  });
-  var uSel = document.getElementById("fUnconfCountry");
-  UNCONF_COUNTRIES.forEach(function(c) {
-    var o = document.createElement("option"); o.value = c; o.textContent = c; uSel.appendChild(o);
-  });
+  // Populate multi-select country filters
+  msPopulate("msConf", CONF_COUNTRIES);
+  msPopulate("msUnconf", UNCONF_COUNTRIES);
+  var allCountries = {};
+  CONF_COUNTRIES.forEach(function(c){ allCountries[c]=1; });
+  UNCONF_COUNTRIES.forEach(function(c){ allCountries[c]=1; });
+  msPopulate("msAny", Object.keys(allCountries).sort());
 
   // Build table header
   var hrow = "<tr>";
@@ -455,10 +479,72 @@ function hasNonGCC(d) {
   return false;
 }
 
+/* ===== MULTI-SELECT ===== */
+function msPopulate(wrapId, items) {
+  var drop = document.getElementById(wrapId + "Drop");
+  var html = '<input class="ms-drop-search" placeholder="Search..." oninput="msSearch(\'' + wrapId + '\', this.value)">';
+  items.forEach(function(c, i) {
+    html += '<div class="ms-item" data-val="' + esc(c) + '"><input type="checkbox" id="' + wrapId + '_' + i + '" onchange="msChanged(\'' + wrapId + '\')"><label for="' + wrapId + '_' + i + '">' + esc(c) + '</label></div>';
+  });
+  drop.innerHTML = html;
+}
+function msToggle(wrapId) {
+  var drop = document.getElementById(wrapId + "Drop");
+  var isOpen = drop.classList.contains("open");
+  document.querySelectorAll(".ms-drop.open").forEach(function(d){ d.classList.remove("open"); d.parentElement.querySelector(".ms-toggle").classList.remove("open"); });
+  if (!isOpen) {
+    drop.classList.add("open");
+    drop.parentElement.querySelector(".ms-toggle").classList.add("open");
+    var si = drop.querySelector(".ms-drop-search");
+    if (si) setTimeout(function(){ si.focus(); }, 50);
+  }
+}
+function msSearch(wrapId, q) {
+  var drop = document.getElementById(wrapId + "Drop");
+  var items = drop.querySelectorAll(".ms-item");
+  q = q.toLowerCase();
+  items.forEach(function(it) {
+    var val = it.getAttribute("data-val").toLowerCase();
+    it.style.display = (!q || val.indexOf(q) !== -1) ? "" : "none";
+  });
+}
+function msChanged(wrapId) {
+  var sel = msGetSelected(wrapId);
+  var toggle = document.getElementById(wrapId).querySelector(".ms-toggle");
+  if (sel.length === 0) { toggle.innerHTML = "All"; }
+  else if (sel.length === 1) { toggle.innerHTML = esc(sel[0]); }
+  else { toggle.innerHTML = sel.length + ' selected'; }
+  applyFilters();
+}
+function msGetSelected(wrapId) {
+  var drop = document.getElementById(wrapId + "Drop");
+  var checks = drop.querySelectorAll("input[type=checkbox]:checked");
+  var result = [];
+  checks.forEach(function(cb) { result.push(cb.closest(".ms-item").getAttribute("data-val")); });
+  return result;
+}
+function msReset(wrapId) {
+  var drop = document.getElementById(wrapId + "Drop");
+  drop.querySelectorAll("input[type=checkbox]").forEach(function(cb){ cb.checked = false; });
+  var si = drop.querySelector(".ms-drop-search");
+  if (si) { si.value = ""; msSearch(wrapId, ""); }
+  drop.classList.remove("open");
+  var toggle = document.getElementById(wrapId).querySelector(".ms-toggle");
+  toggle.innerHTML = "All";
+  toggle.classList.remove("open");
+}
+// Close dropdowns on outside click
+document.addEventListener("click", function(e) {
+  if (!e.target.closest(".ms-wrap")) {
+    document.querySelectorAll(".ms-drop.open").forEach(function(d){ d.classList.remove("open"); d.parentElement.querySelector(".ms-toggle").classList.remove("open"); });
+  }
+});
+
 function applyFilters() {
   var search = document.getElementById("fSearch").value.trim().toLowerCase();
-  var confC = document.getElementById("fConfCountry").value;
-  var unconfC = document.getElementById("fUnconfCountry").value;
+  var confSel = msGetSelected("msConf");
+  var unconfSel = msGetSelected("msUnconf");
+  var anySel = msGetSelected("msAny");
   var fW = document.getElementById("fWebsite").value;
   var fWC = document.getElementById("fWConf").value;
   var fIG = document.getElementById("fIG").value;
@@ -470,8 +556,28 @@ function applyFilters() {
 
   filtered = DATA.filter(function(d) {
     if (nonGCCActive && !hasNonGCC(d)) return false;
-    if (confC && (!d.cc || d.cc.toLowerCase().indexOf(confC.toLowerCase()) === -1)) return false;
-    if (unconfC && (!d.uc || d.uc.toLowerCase().indexOf(unconfC.toLowerCase()) === -1)) return false;
+    if (confSel.length > 0) {
+      var found = false;
+      for (var ci = 0; ci < confSel.length; ci++) {
+        if (d.cc && d.cc.toLowerCase().indexOf(confSel[ci].toLowerCase()) !== -1) { found = true; break; }
+      }
+      if (!found) return false;
+    }
+    if (unconfSel.length > 0) {
+      var found2 = false;
+      for (var ui = 0; ui < unconfSel.length; ui++) {
+        if (d.uc && d.uc.toLowerCase().indexOf(unconfSel[ui].toLowerCase()) !== -1) { found2 = true; break; }
+      }
+      if (!found2) return false;
+    }
+    if (anySel.length > 0) {
+      var found3 = false;
+      var both = ((d.cc || "") + ", " + (d.uc || "")).toLowerCase();
+      for (var ai = 0; ai < anySel.length; ai++) {
+        if (both.indexOf(anySel[ai].toLowerCase()) !== -1) { found3 = true; break; }
+      }
+      if (!found3) return false;
+    }
     if (fW === "yes" && !d.w) return false;
     if (fW === "no" && d.w) return false;
     if (fWC && Math.round(d.wc||0) !== parseInt(fWC)) return false;
@@ -523,8 +629,7 @@ function resetFilters() {
   nonGCCActive = false;
   var btn = document.getElementById("fNonGCC");
   btn.style.background = "transparent"; btn.style.color = "var(--monday)"; btn.style.borderColor = "var(--monday)";
-  document.getElementById("fConfCountry").value = "";
-  document.getElementById("fUnconfCountry").value = "";
+  msReset("msConf"); msReset("msUnconf"); msReset("msAny");
   document.getElementById("fWebsite").value = "";
   document.getElementById("fWConf").value = "";
   document.getElementById("fIG").value = "";
