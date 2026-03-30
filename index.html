@@ -194,9 +194,6 @@ td a:hover { text-decoration: underline; color: var(--day); }
       <span class="filter-label">Search</span>
       <input class="filter-input" id="fSearch" placeholder="Name, email, URL..." oninput="applyFilters()">
     </div>
-    <div class="filter-group" style="justify-content:flex-end">
-      <button class="filter-btn" id="fNonGCC" onclick="toggleNonGCC()" style="white-space:nowrap">Non-GCC</button>
-    </div>
     <div class="filter-group">
       <span class="filter-label">New Confirmed</span>
       <select class="filter-select" id="fConfCountry" onchange="applyFilters()">
@@ -253,6 +250,7 @@ td a:hover { text-decoration: underline; color: var(--day); }
         </select>
       </div>
     </div>
+    <button class="filter-btn" id="fNonGCC" onclick="toggleNonGCC()" style="white-space:nowrap">Non-GCC</button>
     <button class="filter-btn" onclick="resetFilters()">Reset</button>
     <span class="filter-count" id="filterCount"></span>
   </div>
