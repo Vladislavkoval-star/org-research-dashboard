@@ -396,6 +396,20 @@ async function doLogout() {
 
 /* ===== HELPERS ===== */
 function esc(s) { if (!s) return ""; var d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+function maskEmail(e) {
+  if (!e) return "";
+  var parts = e.split("@");
+  if (parts.length !== 2) return esc(e);
+  var local = parts[0];
+  var show = local.length <= 3 ? local.substring(0, 1) : local.substring(0, 3);
+  return esc(show + "***@" + parts[1]);
+}
+function maskPhone(p) {
+  if (!p) return "";
+  var clean = p.replace(/[^0-9+]/g, "");
+  if (clean.length <= 4) return esc(p);
+  return esc(clean.substring(0, clean.length - 4) + "****");
+}
 function confBadge(v) {
   var n = Math.round(v || 0);
   if (n < 1) return '<span class="conf-badge conf-0">—</span>';
@@ -682,8 +696,8 @@ function renderTable() {
     html += '<tr onclick="openModal(' + i + ')">';
     html += '<td>' + globalIdx + '</td>';
     html += '<td class="org-name">' + esc(d.o) + '</td>';
-    html += '<td>' + esc(d.p) + '</td>';
-    html += '<td>' + (d.e ? '<a href="mailto:' + esc(d.e) + '" onclick="event.stopPropagation()">' + esc(d.e) + '</a>' : '—') + '</td>';
+    html += '<td>' + maskPhone(d.p) + '</td>';
+    html += '<td>' + (d.e ? maskEmail(d.e) : '—') + '</td>';
     html += '<td>' + linkCell(d.w, d.wc) + '</td>';
     html += '<td>' + linkCell(d.ig, d.igc) + '</td>';
     html += '<td>' + linkCell(d.fb, d.fbc) + '</td>';
@@ -732,8 +746,8 @@ function openModal(idx) {
   // Region / Market
   html += '<div class="modal-inline"><div class="modal-inline-label">Listed on PL in</div><div class="modal-inline-value">' + esc(d.r) + '</div></div>';
   // Phone / Email
-  html += '<div class="modal-inline"><div class="modal-inline-label">Phone</div><div class="modal-inline-value">' + esc(d.p || "—") + '</div></div>';
-  html += '<div class="modal-inline"><div class="modal-inline-label">Email</div><div class="modal-inline-value">' + (d.e ? '<a href="mailto:' + esc(d.e) + '">' + esc(d.e) + '</a>' : '—') + '</div></div>';
+  html += '<div class="modal-inline"><div class="modal-inline-label">Phone</div><div class="modal-inline-value">' + (d.p ? maskPhone(d.p) : '—') + '</div></div>';
+  html += '<div class="modal-inline"><div class="modal-inline-label">Email</div><div class="modal-inline-value">' + (d.e ? maskEmail(d.e) : '—') + '</div></div>';
   
   // Collapsible: Website
   html += buildCollapsible("Website", d.w ? '<a href="' + esc(d.w) + '" target="_blank">' + esc(d.w) + '</a> ' + confBadge(d.wc) : '—', d.wn, "Research Notes");
