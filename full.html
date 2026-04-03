@@ -462,6 +462,7 @@ function showDetail(idx) {
   document.getElementById("modalTitle").textContent = d.o;
   var fields = [
     ['Region', d.r],
+    ['Sales Manager', d.sm ? '<span style="color:var(--day);font-weight:600">' + d.sm + '</span>' : '—'],
     ['Phone', d.p],
     ['Email', d.e ? '<a href="mailto:' + d.e + '">' + d.e + '</a>' : '—'],
     ['Website', d.w ? '<a href="' + d.w + '" target="_blank">' + d.w + '</a> ' + confBadge(d.wc) : '—'],
