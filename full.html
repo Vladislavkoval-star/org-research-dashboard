@@ -205,6 +205,12 @@ td a:hover { text-decoration: underline; color: var(--day); }
       </select>
     </div>
     <div class="filter-group">
+      <span class="filter-label">Sales Manager</span>
+      <select class="filter-select" id="fSM" onchange="applyFilters()">
+        <option value="">All Sales Managers</option>
+      </select>
+    </div>
+    <div class="filter-group">
       <span class="filter-label">Confidence</span>
       <select class="filter-select" id="fConf" onchange="applyFilters()">
         <option value="">Any Level</option>
@@ -235,6 +241,7 @@ td a:hover { text-decoration: underline; color: var(--day); }
           <th>Countries</th>
           <th>Cities</th>
           <th>Unconfirmed</th>
+          <th onclick="sortBy('sm')">Sales Manager</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -295,6 +302,13 @@ function init() {
   var csel = document.getElementById("fCountry");
   COUNTRIES.forEach(c => { var o = document.createElement("option"); o.value = c; o.textContent = c; csel.appendChild(o); });
 
+    // Populate Sales Manager filter
+  var smSet = {};
+  DATA.forEach(function(d){ if(d.sm) smSet[d.sm]=1; });
+  var smList = Object.keys(smSet).sort();
+  var smSel = document.getElementById("fSM");
+  smList.forEach(function(s){ var o = document.createElement("option"); o.value = s; o.textContent = s; smSel.appendChild(o); });
+
   applyFilters();
 }
 
@@ -307,6 +321,7 @@ function applyFilters() {
   var fF = document.getElementById("fFB").value;
   var fL = document.getElementById("fLI").value;
   var fC = document.getElementById("fConf").value;
+  var fSM = document.getElementById("fSM").value;
 
   filtered = DATA.filter(function(d) {
     if (search && !(d.o.toLowerCase().includes(search) || d.e.toLowerCase().includes(search) || d.w.toLowerCase().includes(search) || (d.ig||'').toLowerCase().includes(search) || (d.cc||'').toLowerCase().includes(search))) return false;
@@ -324,6 +339,7 @@ function applyFilters() {
     if (fC === '4' && Math.max(d.wc||0, d.igc||0, d.fbc||0, d.lic||0) < 4) return false;
     if (fC === '3' && Math.max(d.wc||0, d.igc||0, d.fbc||0, d.lic||0) < 3) return false;
     if (fC === 'low' && Math.max(d.wc||0, d.igc||0, d.fbc||0, d.lic||0) > 2) return false;
+    if (fSM && (d.sm||'') !== fSM) return false;
     return true;
   });
 
@@ -400,6 +416,7 @@ function renderTable() {
       '<td>' + countryPills(d.cc) + '</td>' +
       '<td class="notes-cell"><div class="notes-expand" onclick="event.stopPropagation();this.classList.toggle('open')">' + (d.ci||'—') + '</div></td>' +
       '<td>' + countryPills(d.uc, 'unconfirmed') + '</td>' +
+      '<td style="font-size:11px;color:var(--t2);white-space:nowrap">' + (d.sm||'') + '</td>' +
       '</tr>';
   }
   document.getElementById("tableBody").innerHTML = rows;
