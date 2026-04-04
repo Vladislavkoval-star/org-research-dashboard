@@ -599,6 +599,7 @@ function hasNonGCC(d) {
 function msPopulate(wrapId, items) {
   var drop = document.getElementById(wrapId + "Drop");
   var html = '<input class="ms-drop-search" placeholder="Search..." oninput="msSearch(\'' + wrapId + '\', this.value)">';
+  html += '<div class="ms-select-all" onclick="msToggleAll(\'' + wrapId + '\')" style="padding:6px 12px;cursor:pointer;font-weight:600;color:#4fc3f7;border-bottom:1px solid #333;user-select:none">☑ Select All</div>';
   items.forEach(function(c, i) {
     html += '<div class="ms-item" data-val="' + esc(c) + '"><input type="checkbox" id="' + wrapId + '_' + i + '" onchange="msChanged(\'' + wrapId + '\')"><label for="' + wrapId + '_' + i + '">' + esc(c) + '</label></div>';
   });
@@ -648,6 +649,16 @@ function msReset(wrapId) {
   var toggle = document.getElementById(wrapId).querySelector(".ms-toggle");
   toggle.innerHTML = "All";
   toggle.classList.remove("open");
+}
+function msToggleAll(wrapId) {
+  var drop = document.getElementById(wrapId + "Drop");
+  var checks = drop.querySelectorAll(".ms-item:not([style*='display: none']) input[type=checkbox]");
+  var allChecked = true;
+  checks.forEach(function(cb){ if (!cb.checked) allChecked = false; });
+  checks.forEach(function(cb){ cb.checked = !allChecked; });
+  var btn = drop.querySelector(".ms-select-all");
+  if (btn) btn.innerHTML = allChecked ? "☑ Select All" : "☐ Deselect All";
+  msChanged(wrapId);
 }
 // Close dropdowns on outside click
 document.addEventListener("click", function(e) {
