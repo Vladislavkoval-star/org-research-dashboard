@@ -799,7 +799,7 @@ function renderStats() {
 function renderTable() {
   var start = (currentPage - 1) * PER_PAGE;
   var end = Math.min(start + PER_PAGE, filtered.length);
-  var html = "";
+  var html = "", chtml = "";
   for (var i = start; i < end; i++) {
     var d = filtered[i];
     var globalIdx = start + (i - start) + 1;
@@ -817,8 +817,37 @@ function renderTable() {
     html += '<td>' + countryPills(d.uc, "unconf") + '</td>';
     html += '<td style="font-size:11px;color:var(--t2);white-space:nowrap">' + esc(d.sm || '') + '</td>';
     html += '</tr>';
+    chtml+='<div class="org-card" data-idx="'+i+'">';
+    chtml+='<div class="oc-header" onclick="toggleOrgCard(this.parentElement)">';
+    chtml+='<span class="oc-num">'+globalIdx+'</span>';
+    chtml+='<div class="oc-info"><div class="oc-name">'+esc(d.o)+'</div>';
+    chtml+='<div class="oc-sub">';
+    if(d.sm)chtml+='<span class="oc-sm">'+esc(d.sm)+'</span>';
+    chtml+='<span class="oc-socials" title="W / IG / FB / LI">';
+    chtml+='<span class="oc-dot '+(d.w?'has':'no')+'"></span>';
+    chtml+='<span class="oc-dot '+(d.ig?'has':'no')+'"></span>';
+    chtml+='<span class="oc-dot '+(d.fb?'has':'no')+'"></span>';
+    chtml+='<span class="oc-dot '+(d.li?'has':'no')+'"></span>';
+    chtml+='</span>';
+    if(d.cc){var ccArr=d.cc.split(',');chtml+='<span style="font-size:9px;color:var(--monday)">'+ccArr.length+' countries</span>';}
+    chtml+='</div></div>';
+    chtml+='<span class="oc-arrow">&#9662;</span>';
+    chtml+='</div>';
+    chtml+='<div class="oc-body">';
+    if(d.p)chtml+='<div class="oc-row"><span class="oc-label">Phone</span><span class="oc-value">'+maskPhone(d.p)+'</span></div>';
+    if(d.e)chtml+='<div class="oc-row"><span class="oc-label">Email</span><span class="oc-value">'+maskEmail(d.e)+'</span></div>';
+    chtml+='<div class="oc-row"><span class="oc-label">Website</span><span class="oc-value">'+(d.w?'<a href="'+esc(d.w)+'" target="_blank" onclick="event.stopPropagation()">'+esc(d.w.replace(/^https?:\/\/(www\.)?/,"").replace(/\/$/,"").substring(0,30))+'</a> '+confBadge(d.wc):'—')+'</span></div>';
+    chtml+='<div class="oc-row"><span class="oc-label">Instagram</span><span class="oc-value">'+(d.ig?'<a href="'+esc(d.ig)+'" target="_blank" onclick="event.stopPropagation()">'+esc(d.ig.replace(/^https?:\/\/(www\.)?/,"").replace(/\/$/,"").substring(0,28))+'</a> '+confBadge(d.igc):'—')+'</span></div>';
+    chtml+='<div class="oc-row"><span class="oc-label">Facebook</span><span class="oc-value">'+(d.fb?'<a href="'+esc(d.fb)+'" target="_blank" onclick="event.stopPropagation()">'+esc(d.fb.replace(/^https?:\/\/(www\.)?/,"").replace(/\/$/,"").substring(0,28))+'</a> '+confBadge(d.fbc):'—')+'</span></div>';
+    chtml+='<div class="oc-row"><span class="oc-label">LinkedIn</span><span class="oc-value">'+(d.li?'<a href="'+esc(d.li)+'" target="_blank" onclick="event.stopPropagation()">'+esc(d.li.replace(/^https?:\/\/(www\.)?/,"").replace(/\/$/,"").substring(0,28))+'</a> '+confBadge(d.lic):'—')+'</span></div>';
+    if(d.cc)chtml+='<div class="oc-row" style="flex-direction:column;gap:4px"><span class="oc-label">Confirmed Countries</span><div class="oc-countries" style="justify-content:flex-start">'+countryPills(d.cc)+'</div></div>';
+    if(d.uc)chtml+='<div class="oc-row" style="flex-direction:column;gap:4px"><span class="oc-label">Unconfirmed</span><div class="oc-countries" style="justify-content:flex-start">'+countryPills(d.uc,"unconf")+'</div></div>';
+    chtml+='<button class="oc-detail-btn" onclick="event.stopPropagation();openModal('+i+')">View Full Details</button>';
+    chtml+='</div></div>';
   }
   document.getElementById("tbody").innerHTML = html;
+  var cardsEl=document.getElementById("orgCards");
+  if(cardsEl)cardsEl.innerHTML=chtml;
 }
 
 function renderPagination() {
