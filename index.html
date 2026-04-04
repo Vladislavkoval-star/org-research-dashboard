@@ -164,9 +164,9 @@ td a:hover { text-decoration: underline; color: var(--day); }
 .oc-sub{font-size:10px;color:var(--t2);margin-top:3px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
 .oc-sm{font-size:9px;color:var(--day);font-weight:600;background:rgba(199,248,138,.1);padding:1px 6px;border-radius:6px}
 .oc-socials{display:flex;gap:3px;align-items:center}
-.oc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.oc-dot.has{background:var(--day)}
-.oc-dot.no{background:var(--t3);opacity:.3}
+.oc-sm-tag{font-size:8px;font-weight:700;padding:1px 4px;border-radius:4px;letter-spacing:.3px}
+.oc-sm-tag.has{background:rgba(199,248,138,.15);color:var(--day)}
+.oc-sm-tag.no{background:rgba(61,90,104,.15);color:var(--t3)}
 .oc-arrow{color:var(--t3);font-size:12px;transition:transform .2s;padding:4px}
 .org-card.open .oc-arrow{transform:rotate(180deg)}
 .oc-body{display:none;padding:0 12px 12px;border-top:1px solid var(--bd)}
@@ -181,7 +181,7 @@ td a:hover { text-decoration: underline; color: var(--day); }
 .oc-detail-btn:hover{background:var(--monday);color:var(--black)}
 
 /* MOBILE FILTERS TOGGLE */
-.filters-toggle{display:none;align-items:center;padding:10px 12px;cursor:pointer;user-select:none;background:var(--s1);gap:8px}
+.filters-toggle{display:none;align-items:center;padding:10px 12px;cursor:pointer;user-select:none;background:var(--s1);gap:8px;width:100%}
 .filters-toggle-label{font-size:12px;font-weight:600;color:var(--monday);text-transform:uppercase;letter-spacing:.5px}
 .filters-toggle-count{font-size:11px;color:var(--day);font-weight:600}
 .filters-toggle-arrow{color:var(--t2);font-size:12px;transition:transform .2s;margin-left:auto}
@@ -199,7 +199,7 @@ td a:hover { text-decoration: underline; color: var(--day); }
 .stat-card{padding:7px 6px;border-radius:6px;border-left-width:2px;text-align:center}
 .stat-num{font-size:15px;margin-bottom:0}
 .stat-label{font-size:8px;line-height:1.2}
-.filters-bar{padding:0;border-bottom:1px solid var(--bd);flex-direction:column;gap:0}
+.filters-bar{padding:0;border-bottom:1px solid var(--bd);flex-direction:column;gap:0;align-items:stretch}
 .filters-toggle{display:flex}
 .filters-inner{display:none;padding:10px 12px;flex-wrap:wrap;gap:8px;align-items:flex-end}
 .filters-inner.open{display:flex}
@@ -823,11 +823,11 @@ function renderTable() {
     chtml+='<div class="oc-info"><div class="oc-name">'+esc(d.o)+'</div>';
     chtml+='<div class="oc-sub">';
     if(d.sm)chtml+='<span class="oc-sm">'+esc(d.sm)+'</span>';
-    chtml+='<span class="oc-socials" title="W / IG / FB / LI">';
-    chtml+='<span class="oc-dot '+(d.w?'has':'no')+'"></span>';
-    chtml+='<span class="oc-dot '+(d.ig?'has':'no')+'"></span>';
-    chtml+='<span class="oc-dot '+(d.fb?'has':'no')+'"></span>';
-    chtml+='<span class="oc-dot '+(d.li?'has':'no')+'"></span>';
+    chtml+='<span class="oc-socials">';
+    chtml+='<span class="oc-sm-tag '+(d.w?'has':'no')+'">W</span>';
+    chtml+='<span class="oc-sm-tag '+(d.ig?'has':'no')+'">IG</span>';
+    chtml+='<span class="oc-sm-tag '+(d.fb?'has':'no')+'">FB</span>';
+    chtml+='<span class="oc-sm-tag '+(d.li?'has':'no')+'">LI</span>';
     chtml+='</span>';
     if(d.cc){var ccArr=d.cc.split(',');chtml+='<span style="font-size:9px;color:var(--monday)">'+ccArr.length+' countries</span>';}
     chtml+='</div></div>';
